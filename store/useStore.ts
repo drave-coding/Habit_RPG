@@ -1,33 +1,11 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { persist, PersistStorage, StateStorage } from 'zustand/middleware';
+import { persist, PersistStorage } from 'zustand/middleware';
+import uuid from 'react-native-uuid';
 
-interface Stat {
-  name: string;
-  value: number;
-}
+import { AppState } from 'types/storeType';
+import { calculateHPCap, calculateHPLoss, calculateXPCap, calculateXPGain, updateStatValue } from './utils';
 
-interface Quest {
-  id: string;
-  name: string;
-  stat: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  type: 'positive' | 'negative' | 'both';
-  completed: number;
-  failed: number;
-}
-
-interface AppState {
-  level: number;
-  xp: number;
-  hp: number;
-  stats: Stat[];
-  quests: Quest[];
-  addQuest: (quest: Quest) => void;
-  updateStat: (name: string, amount: number) => void;
-  incrementXP: (amount: number) => void;
-  decrementHP: (amount: number) => void;
-}
 
 // Custom storage interface for AsyncStorage compatibility
 const asyncStorage: PersistStorage<AppState> = {
@@ -43,40 +21,147 @@ const asyncStorage: PersistStorage<AppState> = {
   },
 };
 
+
+
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
       level: 1,
       xp: 0,
-      hp: 100,
+      xpCap: calculateXPCap(1), // Initial XP Cap
+      hp: 15,
+      hpCap: calculateHPCap(1), // Initial HP Cap
+      lastResetDate: new Date().toISOString(),
+      healTries: 3,
       stats: [
-        { name: 'Strength', value: 10 },
-        { name: 'Intelligence', value: 10 },
-        { name: 'Endurance', value: 10 },
-        { name: 'Charisma', value: 10 },
-        { name: 'Agility', value: 10 },
+        { name: 'STR', value: 10 },
+        { name: 'AGI', value: 10 },
+        { name: 'INT', value: 10 },
+        { name: 'PER', value: 10 },
+        { name: 'VIT', value: 10 },
       ],
+     
       quests: [],
-      addQuest: (quest) => set((state) => ({ quests: [...state.quests, quest] })),
-      updateStat: (name, amount) =>
+      heal: () => {
+        set((state) => {
+          if (state.healTries <= 0 || state.xp < 5) {
+            return state; // No heal attempts left or insufficient XP
+          }
+
+          const maxHeal = Math.floor(state.hpCap * 0.5); // Max heal is 50% of HP cap
+          const healAmount = Math.min(Math.floor(state.xp / 5), maxHeal, state.hpCap - state.hp); // Calculate heal amount
+
+          if (healAmount <= 0) {
+            return state; // No healing possible
+          }
+
+          return {
+            ...state,
+            hp: Math.min(state.hp + healAmount, state.hpCap), // Heal without exceeding HP cap
+            xp: state.xp - healAmount * 5, // Deduct XP used for healing
+            healTries: state.healTries - 1, // Decrease heal attempts
+          };
+        });
+      },
+      // Add a quest
+      addQuest: (quest) =>
         set((state) => ({
-          stats: state.stats.map((stat) =>
-            stat.name === name ? { ...stat, value: stat.value + amount } : stat
-          ),
+          quests: [
+            ...state.quests,
+            { ...quest, id: uuid.v4() as string, completed: 0, failed: 0 },
+          ],
         })),
-      incrementXP: (amount) => {
-        const currentXP = get().xp + amount;
-        if (currentXP >= 100) {
-          set({ xp: currentXP - 100, level: get().level + 1 });
-        } else {
-          set({ xp: currentXP });
+
+  
+     // Increment quest logic
+     incrementQuest: (id) => {
+      set((state) => {
+        let updatedState = { ...state };
+
+        const quests = state.quests.map((quest) => {
+          if (quest.id === id) {
+            // Gain XP
+            const xpGain = calculateXPGain(state.level, quest.difficulty);
+            updatedState.xp += xpGain;
+
+            // Handle Level-Up
+            if (updatedState.xp >= updatedState.xpCap) {
+              const extraXP = updatedState.xp - updatedState.xpCap;
+              updatedState.level += 1;
+              updatedState.xpCap = calculateXPCap(updatedState.level);
+              updatedState.hpCap = calculateHPCap(updatedState.level);
+
+              // Add the extra HP from the new HP cap
+              const hpIncrease = updatedState.hpCap - state.hpCap;
+              updatedState.hp = Math.min(updatedState.hp + hpIncrease, updatedState.hpCap);
+
+              // Reset heal tries on level-up
+              updatedState.healTries = 3;
+
+              // Carry over extra XP
+              updatedState.xp = extraXP;
+            }
+
+            // Update Stat
+            if (quest.stat) {
+              const updatedStats = updateStatValue(updatedState, quest.stat, quest.difficulty);
+              updatedState.stats = updatedStats.stats;
+            }
+
+            return { ...quest, completed: quest.completed + 1 };
+          }
+          return quest;
+        });
+
+        return { ...updatedState, quests };
+      });
+    },
+
+      // Decrement quest logic
+      decrementQuest: (id) => {
+        set((state) => {
+          const quests = state.quests.map((quest) =>
+            quest.id === id ? { ...quest, failed: quest.failed + 1 } : quest
+          );
+
+          // Lose HP
+          const quest = state.quests.find((q) => q.id === id);
+          const hpLoss = quest ? calculateHPLoss(state.hpCap, quest.difficulty) : 0;
+
+          return { quests, hp: Math.max(state.hp - hpLoss, 0) };
+        });
+      },
+
+      // Delete a quest
+      deleteQuest: (id) => {
+        set((state) => ({
+          quests: state.quests.filter((quest) => quest.id !== id),
+        }));
+      },
+
+      resetDailyData: () => {
+        const currentDate = new Date().toISOString().split('T')[0]; 
+        const { lastResetDate, quests } = get();
+      
+        
+        if (!lastResetDate || lastResetDate.split('T')[0] !== currentDate) {
+        
+          const resetQuests = quests.map((quest) => ({
+            ...quest,
+            completed: 0,
+            failed: 0,
+          }));
+      
+          set({
+            lastResetDate: new Date().toISOString(), 
+            quests: resetQuests, 
+          });
         }
       },
-      decrementHP: (amount) => set((state) => ({ hp: state.hp - amount })),
     }),
-    { 
-      name: 'app-storage', 
-      storage: asyncStorage 
+    {
+      name: 'app-storage',
+      storage: asyncStorage,
     }
   )
 );
