@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
 import { useStore } from '../store/useStore';
 import NeonText from './utils/NeonText';
 import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getTitleForLevel } from './utils/titles';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const CharacterPanel = () => {
   const { level, xp, hp, hpCap, xpCap } = useStore();
@@ -33,8 +34,8 @@ const CharacterPanel = () => {
 
   // Interpolate border color from transparent to white
   const borderColor = borderColorAnim.interpolate({
-    inputRange: [0, 10],
-    outputRange: ['rgba(255, 255, 255, 0)', 'gray'], // Transparent to white
+    inputRange: [0, 3],
+    outputRange: ['rgba(255, 255, 255, 0)', 'white'], // Transparent to white
   });
 
   const clearStorage = async () => {
@@ -42,72 +43,131 @@ const CharacterPanel = () => {
     console.log('Storage cleared!');
   };
 
+
   return (
-    <View className="p-4 bg-transparent rounded-lg">
+    <View className="rounded-lg bg-transparent p-4">
       {/* Glass Box for Status */}
       <Animated.View
         style={[
           styles.statusBox,
           { borderColor: borderColor }, // Animated border color
-        ]}
-      >
+        ]}>
         <NeonText fontSize={30} fontWeight={900}>
           STATUS
         </NeonText>
       </Animated.View>
 
       {/* Level, Name, and Title */}
-      <View className="flex-row self-center mb-4">
+      <View className="mb-4 flex-row self-center">
         {/* Level */}
         <View className="items-center pl-4 pr-8">
-          <NeonText fontSize={60} fontWeight={900}>{level}</NeonText>
-          <NeonText fontSize={15} fontWeight={500}>Level</NeonText>
+          <NeonText fontSize={60} fontWeight={900}>
+            {level}
+          </NeonText>
+          <NeonText fontSize={15} style={{ marginTop: -11 }} fontWeight={800}>
+            Level
+          </NeonText>
         </View>
 
         {/* Name and Title */}
-        <View className="items-center justify-center start-0">
+        <View className="start-0 items-center justify-center">
           <NeonText fontSize={12} fontWeight={400}>
-            NAME: <NeonText fontSize={18} fontWeight={800}>Drave</NeonText>
+            NAME:{' '}
+            <NeonText fontSize={18} fontWeight={800}>
+              Drave
+            </NeonText>
           </NeonText>
           <NeonText fontSize={12} fontWeight={400}>
-            TITLE: <NeonText fontSize={18} fontWeight={800}>{title}</NeonText>
+            TITLE:{' '}
+            <NeonText fontSize={18} fontWeight={800}>
+              {title}
+            </NeonText>
           </NeonText>
         </View>
       </View>
 
       {/* Progress Bars */}
-      <View className="flex-row justify-between items-center space-x-4 space-y-2 p-4 -ml-8 -mr-8 border-[2px] border-gray-600">
+
+      <View className="-ml-8 -mr-8 flex-row items-center justify-between space-x-2 space-y-2 rounded-lg border border-gray-400 p-4 pl-5 pr-5">
         {/* HP Progress Bar */}
         <View style={styles.progressRow}>
-          <Text style={styles.labelLeft}>HP</Text>
-          <View style={styles.progressWrapper}>
-            <Progress.Bar
-              progress={hp / hpCap} // Convert HP to a value between 0 and 1
-              width={130}
-              height={5}
-              color="#00FFFF" // Cyan for HP
-              unfilledColor="transparent"
-              borderWidth={2}
-              borderRadius={5}
+          <View style={{ alignItems: 'center', marginRight: 1 }}>
+            <FontAwesome5
+              name="plus"
+              size={15}
+              color="white"
+              style={{
+                textShadowColor: 'white',
+                textShadowRadius: 5,
+              }}
             />
-            <Text style={styles.labelRight}>{hp}/{hpCap}</Text>
+            <NeonText fontSize={11} fontWeight={900}>
+              HP
+            </NeonText>
+          </View>
+          <View className="pl-1" style={styles.progressWrapper}>
+            <View
+              style={{
+                padding: 2, // Add padding to create the gap
+                backgroundColor: 'transparent', // Background color for the gap
+                borderRadius: 7, // Match the border radius of the progress bar
+                borderWidth: 1, // Border width for the outer border
+                borderColor: 'white', // Border color
+              }}>
+              <Progress.Bar
+                progress={hp / hpCap} // Convert HP to a value between 0 and 1
+                width={120}
+                height={4}
+                color="white" // Fill color for HP
+                unfilledColor="transparent" // Transparent for the gap
+                borderWidth={0} // Remove the default border of the progress bar
+                borderRadius={5}
+              />
+            </View>
+            <NeonText style={styles.labelRight} fontWeight={400}>
+              {hp}/{hpCap}
+            </NeonText>
           </View>
         </View>
 
         {/* XP Progress Bar */}
         <View style={styles.progressRow}>
-          <Text style={styles.labelLeft}>XP</Text>
-          <View style={styles.progressWrapper}>
-            <Progress.Bar
-              progress={xp / xpCap} // Convert XP to a value between 0 and 1
-              width={130}
-              height={5}
-              color="#00FFFF" // Cyan for XP
-              unfilledColor="transparent"
-              borderWidth={2}
-              borderRadius={5}
+          <View style={{ alignItems: 'center', marginLeft: 2, top: 3 }}>
+            <FontAwesome5
+              name="bolt"
+              size={15}
+              color="white"
+              style={{
+                textShadowColor: 'white',
+                textShadowRadius: 5,
+              }}
             />
-            <Text style={styles.labelRight}>{xp}/{xpCap}</Text>
+            <NeonText fontSize={11} fontWeight={900}>
+              XP
+            </NeonText>
+          </View>
+          <View className="pl-1" style={styles.progressWrapper}>
+            <View
+              style={{
+                padding: 2, // Add padding to create the gap
+                backgroundColor: 'transparent', // Background color for the gap
+                borderRadius: 8, // Match the border radius of the progress bar
+                borderWidth: 1, // Border width for the outer border
+                borderColor: 'white', // Border color
+              }}>
+              <Progress.Bar
+                progress={xp / xpCap} // Convert XP to a value between 0 and 1
+                width={120}
+                height={4}
+                color="white" // Fill color for XP
+                unfilledColor="transparent" // Transparent for the gap
+                borderWidth={0} // Remove the default border of the progress bar
+                borderRadius={5}
+              />
+            </View>
+            <NeonText style={styles.labelRight} fontWeight={400}>
+              {xp}/{xpCap}
+            </NeonText>
           </View>
         </View>
       </View>
@@ -119,16 +179,15 @@ const styles = StyleSheet.create({
   statusBox: {
     padding: 8,
     marginTop: -20,
-    
-    width: 120,
     borderWidth: 2,
+    borderRadius: 8,
+    width: 120,
+
     alignSelf: 'center',
-   
   },
   progressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
   },
   labelLeft: {
     color: '#BDBDBD',
@@ -140,12 +199,13 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   labelRight: {
+    textShadowRadius: 8,
     position: 'absolute',
     bottom: -15,
     right: 0,
-    color: '#BDBDBD',
-    fontSize: 12,
-    fontWeight: 'bold',
+    color: '#f2f2f2',
+    fontSize: 13,
+    fontWeight: '800',
   },
 });
 

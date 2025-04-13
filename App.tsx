@@ -5,6 +5,8 @@ import './global.css';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import HomeScreen from 'screens/HomeScreen';
 import { useStore } from './store/useStore';
+import SoundBox from 'components/utils/soundBox';
+
 
 
 const Stack = createStackNavigator();
@@ -12,9 +14,12 @@ const Stack = createStackNavigator();
 const App = () => {
   const resetDailyData = useStore((state) => state.resetDailyData);
 
+  
+
   useEffect(() => {
     // Trigger reset logic on app load
     resetDailyData();
+    SoundBox.playAppOpen();
   }, [resetDailyData]);
   return (
     

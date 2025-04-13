@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
-import { View, Text } from 'react-native';
+import React, { memo, useEffect, useRef } from 'react';
+import { View, Animated, StyleSheet } from 'react-native';
 import { useStore } from '../store/useStore';
 import Quest from './Quest';
 import { BlurView } from 'expo-blur';
@@ -8,18 +8,67 @@ import NeonText from './utils/NeonText';
 const QuestList = memo(() => {
   const { quests } = useStore();
 
+  // Animated value for border color
+  const borderColorAnim = useRef(new Animated.Value(0)).current;
+
+  // Animate border color on mount
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(borderColorAnim, {
+          toValue: 1, // Transition to white
+          duration: 2000, // 2 seconds
+          useNativeDriver: false,
+        }),
+        Animated.timing(borderColorAnim, {
+          toValue: 0, // Transition back to transparent
+          duration: 2000, // 2 seconds
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, [borderColorAnim]);
+
+  // Interpolate border color from transparent to white
+  const borderColor = borderColorAnim.interpolate({
+    inputRange: [0, 3],
+    outputRange: ['rgba(255, 255, 255, 0)', 'white'], // Transparent to white
+  });
+
   return (
     <View>
-      <BlurView  tint='light' intensity={10}  className=" p-1 -mt-2 border-[2px] mb-2 w-[100px] border-gray-600 self-center">
-      <NeonText fontSize={24} fontWeight={900}>QUESTS</NeonText>
-      </BlurView>
+      <Animated.View
+        style={[
+          styles.animatedBox,
+          { borderColor: borderColor }, // Animated border color
+        ]}
+      >
+        <NeonText fontSize={24} fontWeight={900}>
+          QUESTS
+        </NeonText>
+      </Animated.View>
       {quests.length === 0 ? (
-        <Text className="text-gray-400">No quests added yet.</Text>
+        <NeonText style={{ color: '#bdbdbd' }}>Nothing to hunt... for now.</NeonText>
       ) : (
         quests.map((quest) => <Quest key={quest.id} {...quest} />)
       )}
     </View>
   );
+});
+
+const styles = StyleSheet.create({
+  animatedBox: {
+    alignSelf: 'center',
+    padding: 8,
+    marginBottom: 8,
+    marginTop: -8,
+    width: 120,
+    borderWidth: 2,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
 });
 
 export default QuestList;

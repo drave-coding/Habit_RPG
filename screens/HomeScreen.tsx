@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
-import { View, ScrollView,StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import CharacterPanel from '../components/CharacterPanel';
 import StatsPanel from '../components/StatsPanel';
 import QuestList from '../components/QuestList';
-import { Video,ResizeMode } from 'expo-av';
+import { Video, ResizeMode } from 'expo-av';
 import { TouchableOpacity, Text } from 'react-native';
-const QuestCreationDialog = React.lazy(() => import('../components/QuestCreationDialog'));
+import QuestCreationDialog from '../components/QuestCreationDialog';
+import SoundBox from 'components/utils/soundBox';
+import { FontAwesome5 } from '@expo/vector-icons';
 const HomeScreen = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const handleOpenDialog = async () => {
+    await SoundBox.playMenu(); // Play menu sound
+    setIsDialogOpen(true);
+  };
 
   return (
-    <View className="flex-1 bg-blue-950">
+    <View className="flex-1 ">
       {/* Background Video */}
-
       <Video
         source={require('../assets/bg-video-2.mp4')} // Path to your video file
         style={StyleSheet.absoluteFill} // Make the video cover the entire screen
@@ -21,28 +26,34 @@ const HomeScreen = () => {
         isLooping // Loop the video
         isMuted // Disable audio
         rate={0.6}
-        
       />
       {/* Dark Overlay */}
       <View style={styles.overlay} />
 
-      
-      <ScrollView className="p-6 mt-6" contentContainerStyle={{ paddingBottom: 80 }} >
+      {/* Main Content */}
+      <ScrollView className="mt-6 p-6" contentContainerStyle={{ paddingBottom: 120 }}>
         <CharacterPanel />
         <StatsPanel />
         <QuestList />
       </ScrollView>
 
-      {/* Footer with + Button */}
-      <View className="absolute bottom-4 w-full flex items-center">
-        <TouchableOpacity
-          onPress={() => setIsDialogOpen(true)}
-          className="bg-blue-500 w-12 h-12 rounded-full flex items-center justify-center"
-        >
-          <Text className="text-white text-2xl">+</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={styles.diamondContainer}>
+  <TouchableOpacity
+    onPress={handleOpenDialog}
+    style={styles.addButton}>
+    <FontAwesome5
+              name="plus"
+              size={25}
+              color="black"
+              style={{
+                textShadowColor: 'gray',
+              
+              }}
+            />
+  </TouchableOpacity>
+</View>
 
+      {/* Quest Creation Dialog */}
       {isDialogOpen && <QuestCreationDialog onClose={() => setIsDialogOpen(false)} />}
     </View>
   );
@@ -56,27 +67,32 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 80,
   },
-  footer: {
+  diamondContainer: {
     position: 'absolute',
-    bottom: 16,
-    width: '100%',
-    alignItems: 'center',
-  },
-  addButton: {
-    backgroundColor: '#3b82f6',
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    bottom: 25, // Adjust position as needed
+    alignSelf: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: 'white', // Blue diamond
+    transform: [{ rotate: '45deg' }], // Rotate to form a diamond
     alignItems: 'center',
     justifyContent: 'center',
+    
   },
-  addButtonText: {
-    color: 'white',
-    fontSize: 24,
-  },
+  addButton: {
+    width: 50,
+    height: 50,
+    backgroundColor: 'transparent',
+     // Match diamond color
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '-45deg' }], // Rotate back to make "+" upright
+  }
+ ,
   overlay: {
     ...StyleSheet.absoluteFillObject, // Covers the entire screen
-    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Semi-transparent black
+    backgroundColor: 'rgba(0, 0, 0, 0.15)', // Semi-transparent black 0.2
   },
 });
 export default HomeScreen;

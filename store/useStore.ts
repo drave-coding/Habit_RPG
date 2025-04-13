@@ -5,6 +5,7 @@ import uuid from 'react-native-uuid';
 
 import { AppState } from 'types/storeType';
 import { calculateHPCap, calculateHPLoss, calculateXPCap, calculateXPGain, updateStatValue } from './utils';
+import SoundBox from 'components/utils/soundBox';
 
 
 // Custom storage interface for AsyncStorage compatibility
@@ -97,6 +98,9 @@ export const useStore = create<AppState>()(
 
               // Reset heal tries on level-up
               updatedState.healTries = 3;
+
+               // Play level-up sound
+                SoundBox.playLevelUp();
 
               // Carry over extra XP
               updatedState.xp = extraXP;

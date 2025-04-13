@@ -12,7 +12,6 @@ interface NeonTextProps {
 const NeonText: React.FC<NeonTextProps> = ({
   children,
   fontSize = 20,
-  // color = '#a9fef8',
   color = 'white',
   fontWeight = 'bold', // Default fontWeight
   style,
@@ -23,7 +22,7 @@ const NeonText: React.FC<NeonTextProps> = ({
         {
           fontSize,
           color,
-          textShadowColor: color,
+          textShadowColor: color, // Default neon color
           textShadowOffset: { width: 0, height: 0 },
           textShadowRadius: 10,
           fontWeight, // Use the fontWeight prop
