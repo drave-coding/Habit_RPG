@@ -35,11 +35,11 @@ export const useStore = create<AppState>()(
       lastResetDate: new Date().toISOString(),
       healTries: 3,
       stats: [
-        { name: 'STR', value: 10 },
-        { name: 'AGI', value: 10 },
-        { name: 'INT', value: 10 },
-        { name: 'PER', value: 10 },
-        { name: 'VIT', value: 10 },
+        { name: 'STR', value: 0 },
+        { name: 'AGI', value: 0 },
+        { name: 'INT', value: 0 },
+        { name: 'PER', value: 0 },
+        { name: 'VIT', value: 0 },
       ],
      
       quests: [],

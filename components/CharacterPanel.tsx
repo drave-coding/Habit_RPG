@@ -21,12 +21,12 @@ const CharacterPanel = () => {
         Animated.timing(borderColorAnim, {
           toValue: 1, // Transition to white
           duration: 2000, // 2 seconds
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         Animated.timing(borderColorAnim, {
           toValue: 0, // Transition back to transparent
           duration: 2000, // 2 seconds
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ])
     ).start();
