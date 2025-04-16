@@ -23,15 +23,17 @@ const SoundBox = {
   playMenu: async () => {
     await SoundBox.playSound(SoundBox.sounds.menu);
   },
+
   // Play the "Level Up" sound
   playLevelUp: async () => {
     await SoundBox.playSound(SoundBox.sounds.levelUp);
   },
 
-  // Generic method to play a sound
+  // Generic method to play a sound with a faster playback rate
   playSound: async (soundFile: any) => {
     try {
       const { sound } = await Audio.Sound.createAsync(soundFile);
+      await sound.setRateAsync(1.2, true); // Set playback rate to 1.5x (faster)
       await sound.playAsync();
       // Unload the sound after playback
       sound.setOnPlaybackStatusUpdate((status) => {

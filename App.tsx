@@ -17,10 +17,16 @@ const App = () => {
   
 
   useEffect(() => {
+   
+
     // Trigger reset logic on app load
     resetDailyData();
     SoundBox.playAppOpen();
+
+    // Unload sounds when the app is closed
+    
   }, [resetDailyData]);
+
   return (
     
     <SafeAreaProvider>

@@ -1,32 +1,26 @@
 {
   "expo": {
-    "name": "my-expo-app",
-    "slug": "my-expo-app",
+    "name": "Grind",
+    "slug": "Grind",
     "version": "1.0.0",
-
     "web": {
       "favicon": "./assets/favicon.png"
     },
-
     "experiments": {
       "tsconfigPaths": true
     },
-
     "plugins": [],
-
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-
     "userInterfaceStyle": "light",
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": [
-  "**/*"
-],
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -34,7 +28,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.drave_coding.grind"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c6e5d155-c6cf-4196-bf4b-0558ba0dcaf4"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c6e5d155-c6cf-4196-bf4b-0558ba0dcaf4"
     }
   }
 }
