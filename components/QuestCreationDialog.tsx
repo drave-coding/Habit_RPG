@@ -3,7 +3,7 @@ import { View, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { useStore } from '../store/useStore';
 import uuid from 'react-native-uuid';
 
-import { BlurView } from 'expo-blur';
+
 import { QuestType } from 'types/questTypes';
 import { FontAwesome5 } from '@expo/vector-icons';
 import NeonText from './utils/NeonText';
@@ -61,7 +61,7 @@ const QuestCreationDialog = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <Modal transparent={true} animationType="fade">
-      <BlurView intensity={0} className="  absolute inset-0">
+      
         <View className="flex-1 items-center justify-center">
           <View
             className="w-4/5 rounded-lg border
@@ -238,7 +238,7 @@ const QuestCreationDialog = ({ onClose }: { onClose: () => void }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </BlurView>
+    
     </Modal>
   );
 };

@@ -33,7 +33,7 @@ const SoundBox = {
   playSound: async (soundFile: any) => {
     try {
       const { sound } = await Audio.Sound.createAsync(soundFile);
-      await sound.setRateAsync(1.2, true); // Set playback rate to 1.5x (faster)
+      await sound.setRateAsync(1, true); // Set playback rate to 1.5x (faster)
       await sound.playAsync();
       // Unload the sound after playback
       sound.setOnPlaybackStatusUpdate((status) => {

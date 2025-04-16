@@ -2,7 +2,6 @@ import React, { memo, useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
 import { useStore } from '../store/useStore';
 import Quest from './Quest';
-import { BlurView } from 'expo-blur';
 import NeonText from './utils/NeonText';
 
 const QuestList = memo(() => {

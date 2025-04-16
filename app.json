@@ -31,16 +31,16 @@
       },
       "package": "com.drave_coding.grind"
     },
-    "extra": {
-      "eas": {
-        "projectId": "c6e5d155-c6cf-4196-bf4b-0558ba0dcaf4"
-      }
-    },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "updates": {
       "url": "https://u.expo.dev/c6e5d155-c6cf-4196-bf4b-0558ba0dcaf4"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3835b0a4-9366-4b14-b34f-234b1cc444d0"
+      }
     }
   }
 }
