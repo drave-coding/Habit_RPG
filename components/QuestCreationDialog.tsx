@@ -11,6 +11,7 @@ import SoundBox from './utils/soundBox';
 
 const QuestCreationDialog = ({ onClose }: { onClose: () => void }) => {
   const [name, setName] = useState('');
+  const [count, setCount] = useState('');  
   const [type, setType] = useState<'positive' | 'negative' | 'both'>('positive'); // Updated to match QuestType
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
   const [stat, setStat] = useState<'STR' | 'AGI' | 'PER' | 'INT' | 'VIT'>('STR');
@@ -19,7 +20,7 @@ const QuestCreationDialog = ({ onClose }: { onClose: () => void }) => {
 
   const statIcons = {
     STR: 'dumbbell',
-    AGI: 'running',
+    AGI: 'running', 
     PER: 'eye',
     INT: 'brain',
     VIT: 'heartbeat',
@@ -49,6 +50,7 @@ const QuestCreationDialog = ({ onClose }: { onClose: () => void }) => {
       type, // Use the updated type logic
       completed: 0,
       failed: 0,
+      count: Number(count),
     };
     await SoundBox.playClick();
     addQuest(newQuest);
@@ -72,14 +74,25 @@ const QuestCreationDialog = ({ onClose }: { onClose: () => void }) => {
               style={{ marginBottom: 16, textAlign: 'center', color: 'white' }}>
               Embark on an Epic Journey!
             </NeonText>
-            {/* Quest Name Input */}
+            {/* Name and Count Input */}
+          <View className="flex-row mb-4">
             <TextInput
-              className="mb-4 rounded border border-gray-400 bg-black p-2 font-extrabold text-white"
+              className="flex-4 w-[200px] rounded border border-gray-400 bg-black p-2 font-extrabold text-white"
               placeholder="Name Your Legendary Quest"
               placeholderTextColor="gray"
               value={name}
               onChangeText={setName}
             />
+            <TextInput
+              className="flex-2 ml-2 rounded border border-gray-400 bg-black p-2 font-extrabold text-white"
+              placeholder="Count"
+              placeholderTextColor="gray"
+              keyboardType="numeric"
+              value={count}
+              onChangeText={setCount}
+              
+            />
+          </View>
 
             {/* Type Selection */}
 

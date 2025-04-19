@@ -19,6 +19,9 @@ export interface AppState {
     incrementQuest: (id: string) => void;
     decrementQuest: (id: string) => void;
     deleteQuest: (id: string) => void;
-  
    
+
+    
+  
+    
   }

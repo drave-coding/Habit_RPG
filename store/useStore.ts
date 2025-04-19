@@ -69,11 +69,10 @@ export const useStore = create<AppState>()(
         set((state) => ({
           quests: [
             ...state.quests,
-            { ...quest, id: uuid.v4() as string, completed: 0, failed: 0 },
+            { ...quest, id: uuid.v4() as string, completed: 0, failed: 0,count: quest.count },
           ],
         })),
-
-  
+      
      // Increment quest logic
      incrementQuest: (id) => {
       set((state) => {
@@ -132,7 +131,31 @@ export const useStore = create<AppState>()(
           const quest = state.quests.find((q) => q.id === id);
           const hpLoss = quest ? calculateHPLoss(state.hpCap, quest.difficulty) : 0;
 
-          return { quests, hp: Math.max(state.hp - hpLoss, 0) };
+          const newHp = Math.max(state.hp - hpLoss, 0);
+
+          // Check for Game Over
+          if (newHp === 0) {
+            // Reset the state to initial values
+            return {
+              level: 1,
+              xp: 0,
+              xpCap: calculateXPCap(1),
+              hp: 15,
+              hpCap: calculateHPCap(1),
+              lastResetDate: new Date().toISOString(),
+              healTries: 3,
+              stats: [
+                { name: 'STR', value: 0 },
+                { name: 'AGI', value: 0 },
+                { name: 'INT', value: 0 },
+                { name: 'PER', value: 0 },
+                { name: 'VIT', value: 0 },
+              ],
+              quests: [],
+            };
+          }
+
+          return { quests, hp: newHp };
         });
       },
 
@@ -142,7 +165,8 @@ export const useStore = create<AppState>()(
           quests: state.quests.filter((quest) => quest.id !== id),
         }));
       },
-
+      
+      
       resetDailyData: () => {
         const currentDate = new Date().toISOString().split('T')[0]; 
         const { lastResetDate, quests } = get();

@@ -6,6 +6,7 @@ export interface QuestType {
   type: 'positive' | 'negative' | 'both';  // ✅ Allow 'both'
   completed: number;
   failed: number;
+  count: number; 
 }
 
 
@@ -14,4 +15,4 @@ export interface QuestType {
   export interface Stat {
     name: StatType;
     value: number;
-  }
+  }  

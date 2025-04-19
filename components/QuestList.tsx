@@ -1,11 +1,13 @@
-import React, { memo, useEffect, useRef } from 'react';
+import  { memo, useEffect, useRef, useState } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
 import { useStore } from '../store/useStore';
 import Quest from './Quest';
 import NeonText from './utils/NeonText';
+import { QuestType } from 'types/questTypes';
 
 const QuestList = memo(() => {
   const { quests } = useStore();
+
 
   // Animated value for border color
   const borderColorAnim = useRef(new Animated.Value(0)).current;
@@ -13,7 +15,7 @@ const QuestList = memo(() => {
   // Animate border color on mount
   useEffect(() => {
     Animated.loop(
-      Animated.sequence([
+      Animated.sequence([ 
         Animated.timing(borderColorAnim, {
           toValue: 1, // Transition to white
           duration: 2000, // 2 seconds
@@ -33,6 +35,7 @@ const QuestList = memo(() => {
     inputRange: [0, 3],
     outputRange: ['rgba(255, 255, 255, 0)', 'white'], // Transparent to white
   });
+  
 
   return (
     <View>
@@ -40,7 +43,7 @@ const QuestList = memo(() => {
         style={[
           styles.animatedBox,
           { borderColor: borderColor }, // Animated border color
-        ]}
+        ]} 
       >
         <NeonText fontSize={24} fontWeight={900}>
           QUESTS

@@ -1,14 +1,36 @@
 import React, { memo, useState } from 'react';
 import { View,  TouchableOpacity, Modal } from 'react-native';
 import { useStore } from '../store/useStore';
-import { QuestType } from 'types/questTypes';
+import { QuestType, StatType } from 'types/questTypes';
 import NeonText from './utils/NeonText';
 import SoundBox from './utils/soundBox';
 import { FontAwesome5 } from '@expo/vector-icons'
 
-const Quest = memo(({ id, name,  type, completed, failed }: QuestType) => {
+
+const Quest = memo(({ id, stat, difficulty, name,  type, completed, failed,count }: QuestType) => { 
   const { incrementQuest, decrementQuest, deleteQuest } = useStore();
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
+  const isDisabled = completed >= count || failed >= count; 
+
+   
+   const getIcon = (stat: StatType) => {
+    switch (stat) {
+      case 'STR':
+        return 'dumbbell';
+      case 'AGI':
+        return 'running';
+      case 'INT':
+        return 'brain';
+      case 'PER':
+        return 'eye';
+      case 'VIT':
+        return 'heartbeat';
+      default:
+        return 'star'; // Default to hard if difficulty is not specified
+    }
+  };
+
+  const CurrIcon = getIcon(stat);
   
  // Function to open the delete dialog and play the menu sound
  const handleOpenDeleteDialog = async () => {
@@ -39,16 +61,59 @@ const Quest = memo(({ id, name,  type, completed, failed }: QuestType) => {
   };
 
   return (
+    
     <TouchableOpacity
       onLongPress={handleOpenDeleteDialog} // Handle long press
       activeOpacity={0.8} // Add some feedback on press
     >
       <View className="relative -ml-4 -mr-4 mb-3 rounded-lg border border-gray-400 bg-transparent  p-4">
+      
+       
+        {/* Difficulty Badge (Top Right) */}
+      <View className="absolute top-0.5 right-[60px] flex-row items-center space-x-4">
+        <FontAwesome5
+          name={CurrIcon} // Icon for the st
+          size={10}
+          color="white"
+          style={{
+            textShadowColor: 'white',
+            textShadowRadius: 5,
+          }}
+        />
+        <NeonText
+          fontSize={10}
+          fontWeight="900"
+          style={{
+            color: 'white',
+            textShadowColor: 'white',
+            textShadowRadius: 5,
+            paddingLeft:3,
+          }}
+        >
+          {difficulty === 'easy' ? 'E' : difficulty === 'medium' ? 'M' : 'H'}
+        </NeonText>
+        <NeonText
+          fontSize={10}
+          fontWeight="900"
+          style={{
+            color: 'white',
+            textShadowColor: 'white',
+            textShadowRadius: 5,
+            paddingLeft:3,
+          }}
+        >
+          {count}
+        </NeonText>
+      </View>
         {/* Positive Icon (Left) */}
         {type === 'positive' || type === 'both' ? (
           <TouchableOpacity
             onPress={handleIncrement}
-            className="absolute left-2 top-[25px] -translate-y-1/2">
+            disabled={isDisabled}
+            className="absolute left-2 top-[25px] -translate-y-1/2"
+            style={{ opacity: isDisabled ? 0.25 : 1 }}
+          >
+
             <View className=" -ml-2 h-[50px] w-[45px]  rounded-l-lg border border-r-gray-400">
             <FontAwesome5
                 name="forward" // Forward icon
@@ -69,8 +134,12 @@ const Quest = memo(({ id, name,  type, completed, failed }: QuestType) => {
         {type === 'negative' || type === 'both' ? (
           <TouchableOpacity
             onPress={handleDecrement}
-            className="absolute right-2 top-[25px] -translate-y-1/2">
-            <View className=" -ml-2 h-[50px] w-[40px] pt-[7px] pl-[5px]  rounded-r-lg border border-l-gray-400">
+            className="absolute right-2 top-[25px] -translate-y-1/2"
+            disabled={isDisabled}
+            style={{ opacity: isDisabled ? 0.25 : 1 }}
+          >
+
+            <View className=" -ml-2 h-[50px] w-[40px] pt-[7px] pl-[5px]  rounded-r-lg border border-l-gray-400 border-r-transperant"> 
             <FontAwesome5
                 name="backward" // Forward icon
                 size={20}
@@ -99,9 +168,9 @@ const Quest = memo(({ id, name,  type, completed, failed }: QuestType) => {
         </View>
 
         {/* Completed/Failed Display (Bottom Right) */}
-        <View className="absolute bottom-2 right-[60px]">
+        <View className="absolute bottom-0.5 right-[60px]">
           <NeonText
-            fontSize={16} // Corresponds to "text-sm"
+            fontSize={12} // Corresponds to "text-sm"
             fontWeight="900"
             style={{ color: 'white',textShadowColor:'white',textShadowRadius: 4, }} // Green for completed
           >
